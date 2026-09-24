@@ -8,6 +8,11 @@ set(TYPE_SCRIPTS
 file(GLOB ASSETS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*")
 
 set(SOURCES
+    "Source/Tests.AppRuntime.cpp"
+    "Source/Tests.Console.cpp"
+    "Source/Tests.JavaScript.cpp"
+    "Source/Tests.NodeApi.cpp"
+    "Source/Tests.Scheduling.cpp"
     "Shared/DelayedTaskScheduler.cpp"
     "Shared/StandardStreamLogger.cpp"
     "Shared/TimeoutDispatcher.cpp"
