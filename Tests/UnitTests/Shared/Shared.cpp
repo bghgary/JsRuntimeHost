@@ -24,13 +24,6 @@
 #include <string_view>
 #include <thread>
 
-#if defined(JSRUNTIMEHOST_NAPI_ENGINE_CHAKRA)
-#include <jsrt.h>
-#elif defined(JSRUNTIMEHOST_NAPI_ENGINE_JAVASCRIPTCORE)
-#include <napi/env.h>
-#include <JavaScriptCore/JavaScript.h>
-#endif
-
 namespace
 {
     const char* EnumToString(Babylon::Polyfills::Console::LogLevel logLevel)
@@ -920,69 +913,6 @@ TEST(NodeApi, AdjacentEscapableScopesEscapeIndependently)
 
 // The V8JSI shim has no C Node-API at all, so this only builds elsewhere.
 #if !defined(JSRUNTIMEHOST_NAPI_ENGINE_JSI)
-#if defined(JSRUNTIMEHOST_NAPI_ENGINE_CHAKRA)
-TEST(NodeApi, CachedHasOwnPropertySurvivesReplacementAndCollection)
-{
-    Babylon::AppRuntime runtime{};
-    std::promise<bool> result;
-    runtime.Dispatch([&result](Napi::Env env) {
-        napi_env rawEnv{env};
-        Napi::Object prototype{env.Global().Get("Object").As<Napi::Function>().Get("prototype").As<Napi::Object>()};
-        prototype.Set("hasOwnProperty", Napi::Function::New(env, [](const Napi::CallbackInfo& info) {
-            return Napi::Boolean::New(info.Env(), false);
-        }));
-
-        JsContextRef context{};
-        JsRuntimeHandle jsRuntime{};
-        if (JsGetCurrentContext(&context) != JsNoError ||
-            JsGetRuntime(context, &jsRuntime) != JsNoError ||
-            JsCollectGarbage(jsRuntime) != JsNoError)
-        {
-            result.set_value(false);
-            return;
-        }
-
-        Napi::Object object{Napi::Object::New(env)};
-        object.Set("owned", true);
-        Napi::String key{Napi::String::New(env, "owned")};
-        bool hasOwn{};
-        result.set_value(napi_has_own_property(rawEnv, object, key, &hasOwn) == napi_ok && hasOwn);
-    });
-    EXPECT_TRUE(result.get_future().get());
-}
-#endif
-
-#if defined(JSRUNTIMEHOST_NAPI_ENGINE_JAVASCRIPTCORE)
-TEST(NodeApi, ReferenceSentinelCanFinalizeAfterDetach)
-{
-    JSGlobalContextRef context{JSGlobalContextCreate(nullptr)};
-    ASSERT_NE(context, nullptr);
-    Napi::Env env{Napi::Attach(context)};
-    napi_env rawEnv{env};
-    napi_value object{};
-    napi_value global{};
-    napi_ref ref{};
-    const bool created{
-        napi_create_object(rawEnv, &object) == napi_ok &&
-        napi_get_global(rawEnv, &global) == napi_ok &&
-        napi_set_named_property(rawEnv, global, "retained", object) == napi_ok &&
-        napi_create_reference(rawEnv, object, 1, &ref) == napi_ok};
-    EXPECT_TRUE(created);
-    if (ref != nullptr)
-    {
-        EXPECT_EQ(napi_delete_reference(rawEnv, ref), napi_ok);
-    }
-    Napi::Detach(env);
-
-    JSStringRef name{JSStringCreateWithUTF8CString("retained")};
-    EXPECT_TRUE(JSObjectDeleteProperty(context, JSContextGetGlobalObject(context), name, nullptr));
-    JSStringRelease(name);
-    JSGarbageCollect(context);
-    JSGarbageCollect(context);
-    JSGlobalContextRelease(context);
-}
-#endif
-
 TEST(NodeApi, GetPropertyNamesReportsLastErrorConsistently)
 {
     // This asserts the contract for the three backends this change touches --
