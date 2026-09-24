@@ -46,6 +46,12 @@ elseif(UNIX AND NOT ANDROID)
         Linux/App.cpp)
 endif()
 
+if(NAPI_JAVASCRIPT_ENGINE STREQUAL "Chakra")
+    set(SOURCES ${SOURCES} "Source/Tests.NodeApi.Chakra.cpp")
+elseif(NAPI_JAVASCRIPT_ENGINE STREQUAL "JavaScriptCore")
+    set(SOURCES ${SOURCES} "Source/Tests.NodeApi.JavaScriptCore.cpp")
+endif()
+
 add_executable(UnitTests ${SOURCES} ${SCRIPTS} ${TYPE_SCRIPTS} ${ASSETS})
 if(NAPI_JAVASCRIPT_ENGINE STREQUAL "V8")
     target_sources(UnitTests PRIVATE "Shared/V8ForegroundTaskRunner.cpp")
