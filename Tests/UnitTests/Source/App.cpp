@@ -1,4 +1,4 @@
-#include "Shared.h"
+#include "App.h"
 #include <gtest/gtest.h>
 
 int RunTests()

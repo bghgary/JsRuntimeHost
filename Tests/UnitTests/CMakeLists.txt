@@ -3,21 +3,21 @@ set(SCRIPTS
     "dist/tests.js")
 
 set(TYPE_SCRIPTS
-    "Scripts/tests.ts")
+    "JavaScript/src/tests.javaScript.all.ts")
 
 file(GLOB ASSETS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*")
 
 set(SOURCES
+    "Source/App.cpp"
+    "Source/App.h"
     "Source/Tests.AppRuntime.cpp"
     "Source/Tests.Console.cpp"
+    "Source/Tests.DelayedTaskScheduler.cpp"
     "Source/Tests.JavaScript.cpp"
     "Source/Tests.NodeApi.cpp"
     "Source/Tests.Scheduling.cpp"
-    "Shared/DelayedTaskScheduler.cpp"
-    "Shared/StandardStreamLogger.cpp"
-    "Shared/TimeoutDispatcher.cpp"
-    "Shared/Shared.cpp"
-    "Shared/Shared.h")
+    "Source/Tests.StandardStreamLogger.cpp"
+    "Source/Tests.TimeoutDispatcher.cpp")
 
 if(APPLE)
     if(IOS)
@@ -53,7 +53,7 @@ endif()
 
 add_executable(UnitTests ${SOURCES} ${SCRIPTS} ${TYPE_SCRIPTS} ${ASSETS})
 if(NAPI_JAVASCRIPT_ENGINE STREQUAL "V8")
-    target_sources(UnitTests PRIVATE "Shared/V8ForegroundTaskRunner.cpp")
+    target_sources(UnitTests PRIVATE "Source/Tests.V8ForegroundTaskRunner.cpp")
     target_link_libraries(UnitTests PRIVATE AppRuntimeInternal)
 endif()
 target_compile_definitions(UnitTests PRIVATE JSRUNTIMEHOST_PLATFORM="${JSRUNTIMEHOST_PLATFORM}")
@@ -127,5 +127,5 @@ endif()
 set_property(TARGET UnitTests PROPERTY FOLDER Tests)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES} ${SCRIPTS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Scripts PREFIX scripts FILES ${TYPE_SCRIPTS})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/JavaScript PREFIX scripts FILES ${TYPE_SCRIPTS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Assets PREFIX assets FILES ${ASSETS})
