@@ -1,5 +1,5 @@
 set(SCRIPTS
-    "Scripts/symlink_target.js"
+    "JavaScript/Scripts/symlink_target.js"
     "dist/tests.js")
 
 set(TYPE_SCRIPTS
@@ -22,14 +22,14 @@ set(SOURCES
 if(APPLE)
     if(IOS)
         set(SOURCES ${SOURCES}
-            "iOS/App.mm")
+            "Source/iOS/App.mm")
 
         set(PLIST_FILE
-            "${CMAKE_CURRENT_LIST_DIR}/iOS/Info.plist")
+            "${CMAKE_CURRENT_LIST_DIR}/Source/iOS/Info.plist")
 
         set(STORYBOARD
-            "${CMAKE_CURRENT_LIST_DIR}/iOS/Base.lproj/LaunchScreen.storyboard"
-            "${CMAKE_CURRENT_LIST_DIR}/iOS/Base.lproj/Main.storyboard")
+            "${CMAKE_CURRENT_LIST_DIR}/Source/iOS/Base.lproj/LaunchScreen.storyboard"
+            "${CMAKE_CURRENT_LIST_DIR}/Source/iOS/Base.lproj/Main.storyboard")
 
         set_source_files_properties(
             ${SCRIPTS}
@@ -41,14 +41,14 @@ if(APPLE)
             PROPERTIES MACOSX_PACKAGE_LOCATION "Assets")
     else()
         set(SOURCES ${SOURCES}
-            macOS/App.mm)
+            Source/App.macOS.mm)
     endif()
 elseif(WIN32)
     set(SOURCES ${SOURCES}
-        Win32/App.cpp)
+        Source/App.Win32.cpp)
 elseif(UNIX AND NOT ANDROID)
     set(SOURCES ${SOURCES}
-        Linux/App.cpp)
+        Source/App.Linux.cpp)
 endif()
 
 add_executable(UnitTests ${SOURCES} ${SCRIPTS} ${TYPE_SCRIPTS} ${ASSETS})

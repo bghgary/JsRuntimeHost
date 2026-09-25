@@ -1,4 +1,4 @@
-#include "../Source/App.h"
+#include "../App.h"
 #include "Babylon/DebugTrace.h"
 #include <iostream>
 #import <Foundation/Foundation.h>
