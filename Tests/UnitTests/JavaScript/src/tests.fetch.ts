@@ -23,12 +23,12 @@ describe("fetch", function () {
     });
 
     it("text() should return the body as a string", async function () {
-        const response = await fetch("app:///Scripts/symlink_target.js");
+        const response = await fetch("app:///Assets/symlink_target.js");
         expect(await response.text()).to.equal("var symlink_target_js = true;");
     });
 
     it("arrayBuffer() should return the body as bytes", async function () {
-        const response = await fetch("app:///Scripts/symlink_target.js");
+        const response = await fetch("app:///Assets/symlink_target.js");
         const expected = new Uint8Array("var symlink_target_js = true;".split("").map(x => x.charCodeAt(0)));
         expect(new Uint8Array(await response.arrayBuffer())).to.eql(expected);
     });
@@ -42,7 +42,7 @@ describe("fetch", function () {
     });
 
     it("json() should reject when the body is not valid JSON", async function () {
-        const response = await fetch("app:///Scripts/symlink_target.js");
+        const response = await fetch("app:///Assets/symlink_target.js");
         let rejected = false;
         try {
             await response.json();
@@ -53,7 +53,7 @@ describe("fetch", function () {
     });
 
     it("blob() should return a Blob with the body bytes", async function () {
-        const response = await fetch("app:///Scripts/symlink_target.js");
+        const response = await fetch("app:///Assets/symlink_target.js");
         const blob = await response.blob();
         expect(blob.size).to.equal("var symlink_target_js = true;".length);
         expect(await blob.text()).to.equal("var symlink_target_js = true;");
@@ -66,7 +66,7 @@ describe("fetch", function () {
     });
 
     it("clone() should produce an independently readable response", async function () {
-        const response = await fetch("app:///Scripts/symlink_target.js");
+        const response = await fetch("app:///Assets/symlink_target.js");
         const clone = response.clone();
         expect(await response.text()).to.equal("var symlink_target_js = true;");
         expect(await clone.text()).to.equal("var symlink_target_js = true;");

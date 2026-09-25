@@ -1,5 +1,4 @@
 set(SCRIPTS
-    "JavaScript/Scripts/symlink_target.js"
     "dist/tests.js")
 
 set(TYPE_SCRIPTS
@@ -112,9 +111,9 @@ else()
     endforeach()
 
     add_custom_command(TARGET UnitTests POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Scripts/symlink_target.js" "${CMAKE_CFG_INTDIR}/Scripts/symlink_1.js")
+        COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Assets/symlink_target.js" "${CMAKE_CFG_INTDIR}/Assets/symlink_1.js")
     add_custom_command(TARGET UnitTests POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Scripts/symlink_1.js" "${CMAKE_CFG_INTDIR}/Scripts/symlink_2.js")
+        COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Assets/symlink_1.js" "${CMAKE_CFG_INTDIR}/Assets/symlink_2.js")
 
     foreach(ASSET ${ASSETS})
         get_filename_component(ASSET_NAME "${ASSET}" NAME)

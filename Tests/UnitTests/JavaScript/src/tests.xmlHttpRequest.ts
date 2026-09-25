@@ -99,7 +99,7 @@ describe("XMLHTTPRequest", function () {
     });
 
     it("should expose empty errorCode/errorDetail after a successful request", async function () {
-        const xhr: any = await createRequest("GET", "app:///Scripts/symlink_target.js");
+        const xhr: any = await createRequest("GET", "app:///Assets/symlink_target.js");
         expect(xhr.errorCode).to.equal("");
         expect(xhr.errorDetail).to.equal("");
     });
@@ -163,18 +163,18 @@ describe("XMLHTTPRequest", function () {
 
     if (hostPlatform === "macOS" || hostPlatform === "Unix" || hostPlatform === "Win32") {
         it("should load URL pointing to symlink", async function () {
-            const xhr = await createRequest("GET", "app:///Scripts/symlink_1.js");
+            const xhr = await createRequest("GET", "app:///Assets/symlink_1.js");
             expect(xhr).to.have.property("responseText", "var symlink_target_js = true;");
         });
 
         it("should load URL pointing to symlink that points to a symlink", async function () {
-            const xhr = await createRequest("GET", "app:///Scripts/symlink_2.js");
+            const xhr = await createRequest("GET", "app:///Assets/symlink_2.js");
             expect(xhr).to.have.property("responseText", "var symlink_target_js = true;");
         });
     }
 
     it("should load URL as array buffer", async function () {
-        const xhr = await createRequest("GET", "app:///Scripts/symlink_target.js", undefined, "arraybuffer");
+        const xhr = await createRequest("GET", "app:///Assets/symlink_target.js", undefined, "arraybuffer");
         var expected = new Uint8Array("var symlink_target_js = true;".split("").map(x => x.charCodeAt(0)));
         var response = new Uint8Array(xhr.response);
         expect(response).to.eql(expected);
