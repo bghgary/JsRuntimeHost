@@ -420,9 +420,9 @@ describe("URL", function () {
     });
 
     it("should parse custom scheme URL", function () {
-        const url = new URL("app:///Scripts/test.js");
+        const url = new URL("app:///Assets/tests.js");
         expect(url.protocol).to.equal("app:");
-        expect(url.pathname).to.equal("/Scripts/test.js");
+        expect(url.pathname).to.equal("/Assets/tests.js");
     });
 });
 

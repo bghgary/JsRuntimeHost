@@ -33,7 +33,7 @@ if(APPLE)
         set_source_files_properties(
             ${SCRIPTS}
             ${TYPE_SCRIPTS}
-            PROPERTIES MACOSX_PACKAGE_LOCATION "Scripts")
+            PROPERTIES MACOSX_PACKAGE_LOCATION "Assets")
 
         set_source_files_properties(
             ${ASSETS}
@@ -101,11 +101,16 @@ if(IOS)
         XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET}
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.jsruntimehost.unittests")
 else()
+    # Incremental builds may still have resources from the former Scripts directory.
+    add_custom_command(TARGET UnitTests POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E rm -rf "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Scripts")
+
     foreach(SCRIPT ${SCRIPTS})
         get_filename_component(SCRIPT_NAME "${SCRIPT}" NAME)
         add_custom_command(
-            OUTPUT "${CMAKE_CFG_INTDIR}/Scripts/${SCRIPT_NAME}"
-            COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT}" "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Scripts/${SCRIPT_NAME}"
+            OUTPUT "${CMAKE_CFG_INTDIR}/Assets/${SCRIPT_NAME}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Assets"
+            COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT}" "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/Assets/${SCRIPT_NAME}"
             COMMENT "Copying ${SCRIPT_NAME}"
             MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/${SCRIPT}")
     endforeach()
