@@ -55,14 +55,38 @@ if (hostPlatform !== "Unix") {
             const testMessage2 = "testMessage2";
             let error: unknown;
 
+            // Printed only on failure, to show which socket closed or failed first and when.
+            const startTime = Date.now();
+            const timeline: string[] = [];
+            const record = (event: string, detail?: { code?: number, reason?: string, message?: string }) => {
+                let entry = `${Date.now() - startTime}ms ${event}`;
+                if (detail) {
+                    entry += ` ${JSON.stringify({ code: detail.code, reason: detail.reason, message: detail.message })}`;
+                }
+                timeline.push(entry);
+            };
+            const finish = () => {
+                if (error) {
+                    const failure = error instanceof Error ? error : new Error(String(error));
+                    failure.message += `\nWebSocket timeline:\n${timeline.join("\n")}`;
+                    done(failure);
+                }
+                else {
+                    done();
+                }
+            };
+
             const ws1 = new WebSocket("wss://ws.postman-echo.com/raw");
             ws1.onopen = () => {
+                record("ws1 open");
                 const ws2 = new WebSocket("wss://ws.postman-echo.com/raw");
                 ws2.onopen = () => {
+                    record("ws2 open");
                     try {
                         expect(ws2).to.have.property("readyState", 1);
                         expect(ws2).to.have.property("url", "wss://ws.postman-echo.com/raw");
                         ws2.send(testMessage2);
+                        record("ws2 send");
                     }
                     catch (e) {
                         error = e;
@@ -71,6 +95,7 @@ if (hostPlatform !== "Unix") {
                 };
 
                 ws2.onmessage = (msg) => {
+                    record("ws2 message");
                     try {
                         expect(msg.data).to.equal(testMessage2);
                     }
@@ -80,11 +105,13 @@ if (hostPlatform !== "Unix") {
                     ws2.close();
                 };
 
-                ws2.onclose = () => {
+                ws2.onclose = (event) => {
+                    record("ws2 close", event);
                     if (!error) {
                         try {
                             expect(ws2).to.have.property("readyState", 3);
                             ws1.send(testMessage1);
+                            record("ws1 send");
                         }
                         catch (e) {
                             error = e;
@@ -96,12 +123,14 @@ if (hostPlatform !== "Unix") {
                     }
                 };
 
-                ws2.onerror = () => {
+                ws2.onerror = (event) => {
+                    record("ws2 error", event as ErrorEvent);
                     error = new Error("WebSocket failed");
                 };
             }
 
             ws1.onmessage = (msg) => {
+                record("ws1 message");
                 try {
                     expect(msg.data).to.equal(testMessage1);
                 }
@@ -111,7 +140,8 @@ if (hostPlatform !== "Unix") {
                 ws1.close();
             }
 
-            ws1.onclose = () => {
+            ws1.onclose = (event) => {
+                record("ws1 close", event);
                 if (!error) {
                     try {
                         expect(ws1).to.have.property("readyState", 3);
@@ -120,10 +150,11 @@ if (hostPlatform !== "Unix") {
                         error = e;
                     }
                 }
-                done(error);
+                finish();
             }
 
-            ws1.onerror = () => {
+            ws1.onerror = (event) => {
+                record("ws1 error", event as ErrorEvent);
                 error = new Error("WebSocket failed");
             };
         });
